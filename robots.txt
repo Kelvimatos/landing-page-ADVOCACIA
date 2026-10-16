@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://marcussayeg.adv.br/sitemap.xml
+
