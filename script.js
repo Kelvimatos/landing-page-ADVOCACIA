@@ -570,25 +570,28 @@ document.addEventListener('DOMContentLoaded', () => {
     modalTitle.textContent = title;
     modalContent.innerHTML = html;
 
-    if (relatedIds && relatedIds.length > 0) {
-      modalRelatedList.innerHTML = '';
+    if (relatedIds && Array.isArray(relatedIds) && relatedIds.length > 0) {
+      modalRelatedList.replaceChildren();
       relatedIds.forEach(relId => {
-        const relArticle = ARTICLES_CONTENT[relId];
-        if (relArticle) {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'related-item-btn';
-          btn.textContent = relArticle.title;
-          btn.addEventListener('click', () => {
-            openArticleById(relId, null);
-            const modalBody = modalBackdrop.querySelector('.editorial-modal-body');
-            if (modalBody) modalBody.scrollTop = 0;
-          });
-          modalRelatedList.appendChild(btn);
+        if (typeof relId === 'string' && Object.prototype.hasOwnProperty.call(ARTICLES_CONTENT, relId)) {
+          const relArticle = ARTICLES_CONTENT[relId];
+          if (relArticle) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'related-item-btn';
+            btn.textContent = relArticle.title;
+            btn.addEventListener('click', () => {
+              openArticleById(relId, null);
+              const modalBody = modalBackdrop.querySelector('.editorial-modal-body');
+              if (modalBody) modalBody.scrollTop = 0;
+            });
+            modalRelatedList.appendChild(btn);
+          }
         }
       });
       modalRelatedWrapper.removeAttribute('hidden');
     } else {
+      modalRelatedList.replaceChildren();
       modalRelatedWrapper.setAttribute('hidden', '');
     }
 
@@ -610,6 +613,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function openArticleById(articleId, triggerEl) {
+    if (!articleId || typeof articleId !== 'string') return;
+    if (!Object.prototype.hasOwnProperty.call(ARTICLES_CONTENT, articleId)) return;
     const data = ARTICLES_CONTENT[articleId];
     if (!data) return;
     openReaderModal({
@@ -622,6 +627,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function openAreaById(areaId, triggerEl) {
+    if (!areaId || typeof areaId !== 'string') return;
+    if (!Object.prototype.hasOwnProperty.call(PRACTICE_AREAS_CONTENT, areaId)) return;
     const data = PRACTICE_AREAS_CONTENT[areaId];
     if (!data) return;
     openReaderModal({
@@ -712,7 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (contactForm) {
     const nomeInput = document.getElementById('nome');
-    const contatoInput = document.getElementById('contato');
+    const contatoInput = document.getElementById('contato_retorno') || document.getElementById('contato');
     const assuntoSelect = document.getElementById('assunto');
     const mensagemInput = document.getElementById('mensagem');
     const honeypotInput = document.getElementById('website_url');
@@ -745,10 +752,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       let isValid = true;
-      const nomeVal = nomeInput ? nomeInput.value.trim() : '';
-      const contatoVal = contatoInput ? contatoInput.value.trim() : '';
-      const assuntoVal = assuntoSelect ? assuntoSelect.value.trim() : '';
-      const mensagemVal = mensagemInput ? mensagemInput.value.trim() : '';
+      // Sanitize inputs to prevent CRLF injection and URL length overflow
+      const sanitizeSingleLine = (val, max = 100) => String(val || '').replace(/[\r\n\t]/g, ' ').trim().slice(0, max);
+      const sanitizeMultiLine = (val, max = 1500) => String(val || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().slice(0, max);
+
+      const nomeVal = sanitizeSingleLine(nomeInput ? nomeInput.value : '', 100);
+      const contatoVal = sanitizeSingleLine(contatoInput ? contatoInput.value : '', 120);
+      const assuntoVal = sanitizeSingleLine(assuntoSelect ? assuntoSelect.value : '', 80);
+      const mensagemVal = sanitizeMultiLine(mensagemInput ? mensagemInput.value : '', 1500);
 
       if (nomeVal.length < 2) {
         setFieldError(nomeInput, nomeError, 'Por favor, informe seu nome.');

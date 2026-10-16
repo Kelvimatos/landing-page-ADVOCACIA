@@ -10,6 +10,11 @@
   <meta name="author" content="Marcus Sayeg">
   <link rel="canonical" href="https://marcussayeg.adv.br/">
 
+  <!-- Security Headers (Client-Side Directives) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://wa.me mailto:; upgrade-insecure-requests;">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
   <!-- Favicon & Touch Icons (Official Marcus Sayeg Monogram) -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -863,6 +868,7 @@
                     class="field-input"
                     placeholder="Seu nome"
                     autocomplete="name"
+                    maxlength="100"
                     required
                     aria-required="true"
                     aria-describedby="nome-error"
@@ -871,14 +877,15 @@
                 </div>
 
                 <div class="form-field">
-                  <label for="contato" class="field-label">E-mail ou telefone *</label>
+                  <label for="contato_retorno" class="field-label">E-mail ou telefone *</label>
                   <input
                     type="text"
-                    id="contato"
+                    id="contato_retorno"
                     name="contato"
                     class="field-input"
                     placeholder="(11) 99999-9999 ou e-mail"
                     autocomplete="email"
+                    maxlength="120"
                     required
                     aria-required="true"
                     aria-describedby="contato-error"
@@ -915,6 +922,7 @@
                   name="mensagem"
                   class="field-textarea"
                   rows="3"
+                  maxlength="1500"
                   placeholder="Síntese geral da dúvida. Evite incluir documentos ou relatos íntimos neste primeiro envio."
                 ></textarea>
               </div>

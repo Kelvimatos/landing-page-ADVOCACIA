@@ -1,0 +1,48 @@
+# ==============================================================================
+# MARCUS SAYEG ADVOCACIA — PRODUCTION SECURITY & HEADERS CONFIGURATION (.htaccess)
+# ==============================================================================
+
+# Disable directory browsing
+Options -Indexes
+
+# Block access to hidden files and sensitive extensions
+<FilesMatch "^\.">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+<FilesMatch "(^#.*#|\.(bak|conf|dist|fla|in[ci]|log|psd|sh|sql|sw[op]|env))$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# HTTP Security Headers
+<IfModule mod_headers.c>
+  # Clickjacking Protection
+  Header set X-Frame-Options "DENY"
+
+  # MIME Sniffing Protection
+  Header set X-Content-Type-Options "nosniff"
+
+  # Referrer Policy
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Permissions Policy (Restrict unneeded hardware APIs)
+  Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+
+  # HSTS (Strict Transport Security - 1 Year)
+  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # Content Security Policy (Strict & Tailored)
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://wa.me mailto:; upgrade-insecure-requests;"
+
+  # Cross-Origin Policies
+  Header set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+  Header set Cross-Origin-Resource-Policy "same-origin"
+
+  # Static Assets Caching
+  <FilesMatch "\.(ico|png|jpg|jpeg|svg|webp|woff|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
